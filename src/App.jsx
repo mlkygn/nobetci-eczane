@@ -1,23 +1,30 @@
-import { useState } from 'react'
-import './App.css'
-import Badge from 'react-bootstrap/Badge';
-import Button from 'react-bootstrap/Button';
+import { useState } from "react";
+import "./App.css";
 
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
+import Map from "./components/Map/Map";
+import Sidebar from "./components/Sidebar/Sidebar";
+import Navbar from "./components/Navbar/Navbar";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-    <h1>
-      Example heading
-      <Badge bg="secondary" as={Button}>
-        New
-      </Badge>
-    </h1>
-     
+      <Navbar />
+      <Container className="py-5">
+        <Row>
+          <Col sm={4}>
+            <Sidebar />
+          </Col>
+          <Col sm={8}>
+            <Map />
+          </Col>
+        </Row>
+      </Container>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
