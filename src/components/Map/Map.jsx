@@ -7,11 +7,28 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
 function Map() {
+
+  const [position, setPosition] = useState({ latitude: null, longitude: null });
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+      console.log(position.coords.latitude, position.coords.latitude);
+        setPosition({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      });
+    } else {
+      console.log("Geolocation is not available in your browser.");
+    }
+  }, []);
+
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(29.0530);
-  const [lat, setLat] = useState(40.1995);
+  const [lat, setLat] = useState(position.latitude);
+  const [lng, setLng] = useState(position.longitude);
   const [zoom, setZoom] = useState(16);
+
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
@@ -21,7 +38,6 @@ function Map() {
       zoom: zoom,
     });
   });
-
   return (
     <>
       <div>
