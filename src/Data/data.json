@@ -1,5 +1,5 @@
-{
-  "0": {
+[
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "ÇALI CEREN ECZANESİ",
@@ -11,7 +11,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-15 20:00:00"
   },
-  "1": {
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "TOKOĞLU SAĞLIK ECZANESİ",
@@ -23,7 +23,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "2": {
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "DOLUNAY ECZANESİ",
@@ -35,7 +35,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "3": {
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "ŞULE SAĞLIK ECZANESİ",
@@ -47,7 +47,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "4": {
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "BEŞEVLER SAĞLIK ECZANESİ",
@@ -59,7 +59,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "5": {
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "SİNEM ECZANESİ",
@@ -71,7 +71,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "6": {
+  {
     "ilce": "NİLÜFER",
     "bolge": "Nilüfer",
     "eczane": "TOPÇUOĞLU ECZANESİ",
@@ -83,7 +83,7 @@
     "baslangic": "2024-02-15 21:00:00",
     "bitis": "2024-02-15 22:00:00"
   },
-  "7": {
+  {
     "ilce": "OSMANGAZİ",
     "bolge": "Osmangazi - Merkez",
     "eczane": "VEYSEL KARANİ ECZANESİ",
@@ -95,7 +95,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "8": {
+  {
     "ilce": "OSMANGAZİ",
     "bolge": "Osmangazi - Merkez",
     "eczane": "KAĞAN ECZANESİ",
@@ -107,7 +107,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "9": {
+  {
     "ilce": "OSMANGAZİ",
     "bolge": "Osmangazi - Merkez",
     "eczane": "GEÇİT MURAT ECZANESİ",
@@ -119,7 +119,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "10": {
+  {
     "ilce": "OSMANGAZİ",
     "bolge": "Osmangazi - Merkez",
     "eczane": "COŞKUN ECZANESİ",
@@ -131,7 +131,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "11": {
+  {
     "ilce": "OSMANGAZİ",
     "bolge": "Osmangazi - Merkez",
     "eczane": "SÜMER ECZANESİ",
@@ -143,7 +143,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "12": {
+  {
     "ilce": "OSMANGAZİ",
     "bolge": "Osmangazi - Demirtaş",
     "eczane": "ULUÇINAR ECZANESİ",
@@ -155,7 +155,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "13": {
+  {
     "ilce": "YILDIRIM",
     "bolge": "Yıldırım",
     "eczane": "AHISKA ECZANESİ",
@@ -167,7 +167,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "14": {
+  {
     "ilce": "YILDIRIM",
     "bolge": "Yıldırım",
     "eczane": "BAĞLAR ECZANESİ",
@@ -179,7 +179,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "15": {
+  {
     "ilce": "YILDIRIM",
     "bolge": "Yıldırım",
     "eczane": "SİNANDEDE ECZANESİ",
@@ -191,7 +191,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "16": {
+  {
     "ilce": "YILDIRIM",
     "bolge": "Yıldırım",
     "eczane": "YASEMİN ECZANESİ",
@@ -203,7 +203,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "17": {
+  {
     "ilce": "BÜYÜKORHAN",
     "bolge": "Büyükorhan",
     "eczane": "BÜYÜKORHAN ECZANESİ",
@@ -215,7 +215,7 @@
     "baslangic": "2024-02-15 19:00:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "18": {
+  {
     "ilce": "GEMLİK",
     "bolge": "Gemlik",
     "eczane": "GEMLİK SAĞLIK ECZANESİ",
@@ -227,7 +227,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "19": {
+  {
     "ilce": "GEMLİK",
     "bolge": "Gemlik",
     "eczane": "CİHATLI ECZANESİ",
@@ -239,7 +239,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "20": {
+  {
     "ilce": "GÜRSU",
     "bolge": "Gürsu",
     "eczane": "CEREN ECZANESİ",
@@ -251,7 +251,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 09:00:00"
   },
-  "21": {
+  {
     "ilce": "HARMANCIK",
     "bolge": "Harmancık",
     "eczane": "ULAŞ ECZANESİ",
@@ -263,7 +263,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "22": {
+  {
     "ilce": "İNEGÖL",
     "bolge": "İnegöl - Merkez",
     "eczane": "ANNEM ECZANESİ",
@@ -275,7 +275,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 01:00:00"
   },
-  "23": {
+  {
     "ilce": "İNEGÖL",
     "bolge": "İnegöl - Merkez",
     "eczane": "ENVER ECZANESİ",
@@ -287,7 +287,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 01:00:00"
   },
-  "24": {
+  {
     "ilce": "İNEGÖL",
     "bolge": "İnegöl - Merkez",
     "eczane": "YOĞURT PAZARI ECZANESİ",
@@ -299,7 +299,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "25": {
+  {
     "ilce": "İZNİK",
     "bolge": "İznik",
     "eczane": "BEKTAŞ ECZANESİ",
@@ -311,7 +311,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "26": {
+  {
     "ilce": "KARACABEY",
     "bolge": "Karacabey",
     "eczane": "KARACABEY ECZANESİ",
@@ -323,7 +323,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "27": {
+  {
     "ilce": "KELES",
     "bolge": "Keles",
     "eczane": "ÇINAR ECZANESİ",
@@ -335,7 +335,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 09:30:00"
   },
-  "28": {
+  {
     "ilce": "KESTEL",
     "bolge": "Kestel",
     "eczane": "EDA GÜNDÜZ ECZANESİ",
@@ -347,7 +347,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "29": {
+  {
     "ilce": "MUDANYA",
     "bolge": "Mudanya",
     "eczane": "BİLGİN ECZANESİ",
@@ -359,7 +359,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "30": {
+  {
     "ilce": "MUDANYA",
     "bolge": "Mudanya - Güzelyalı",
     "eczane": "ŞERİF DENİZ ECZANESİ",
@@ -371,7 +371,7 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 01:00:00"
   },
-  "31": {
+  {
     "ilce": "MUSTAFAKEMALPAŞA",
     "bolge": "Mustafakemalpaşa",
     "eczane": "AZİM ECZANESİ",
@@ -383,7 +383,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "32": {
+  {
     "ilce": "ORHANELİ",
     "bolge": "Orhaneli",
     "eczane": "ÜMİT ECZANESİ",
@@ -395,7 +395,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "33": {
+  {
     "ilce": "ORHANGAZİ",
     "bolge": "Orhangazi",
     "eczane": "ÇAKIR ECZANESİ",
@@ -407,7 +407,7 @@
     "baslangic": "2024-02-15 18:30:00",
     "bitis": "2024-02-16 08:30:00"
   },
-  "34": {
+  {
     "ilce": "YENİŞEHİR",
     "bolge": "Yenişehir",
     "eczane": "YASEMİN ECZANESİ",
@@ -419,4 +419,4 @@
     "baslangic": "2024-02-15 18:00:00",
     "bitis": "2024-02-16 08:00:00"
   }
-}
+]

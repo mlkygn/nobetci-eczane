@@ -16,6 +16,7 @@ function App() {
       <Container className="py-5">
         <Row>
           <Col sm={4}>
+            <h1 className="mb-4">Nöbetçi Eczaneler</h1>
             <Sidebar />
           </Col>
           <Col sm={8}>

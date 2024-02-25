@@ -1,28 +1,16 @@
 import React from "react";
-import {Nav} from "react-bootstrap";
+import Card from 'react-bootstrap/Card';
+import ListGroup from "react-bootstrap/ListGroup";
+import "./sidebar.css";
 
 export default function Sidebar() {
   return (
-    <Nav
-      className="col-md-12 d-none d-md-block bg-light sidebar"
-      activeKey="/home"
-      onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
-    >
-      <div className="sidebar-sticky"></div>
-      <Nav.Item>
-        <Nav.Link href="/home">Active</Nav.Link>
-      </Nav.Item>
-      <Nav.Item>
-        <Nav.Link eventKey="link-1">Link</Nav.Link>
-      </Nav.Item>
-      <Nav.Item>
-        <Nav.Link eventKey="link-2">Link</Nav.Link>
-      </Nav.Item>
-      <Nav.Item>
-        <Nav.Link eventKey="disabled" disabled>
-          Disabled
-        </Nav.Link>
-      </Nav.Item>
-    </Nav>
+    <Card style={{ width: '18rem' }}>
+      <ListGroup variant="flush">
+        <ListGroup.Item>Cras justo odio</ListGroup.Item>
+        <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
+        <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+      </ListGroup>
+    </Card>
   );
 }
