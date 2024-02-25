@@ -1,14 +1,24 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import Spinner from "react-bootstrap/Spinner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.css";
 import mapboxgl from "mapbox-gl";
-import Data from "../../Data/data.json";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
-function Map() {
+const Map = forwardRef(function Map({ dataPharmacy }, ref) {
+  useImperativeHandle(ref, () => {
+    return {
+      flyTo: flyTo,
+    };
+  });
   const [userLoc, setuserLoc] = useState({
     latitude: null,
     longitude: null,
@@ -17,7 +27,7 @@ function Map() {
   const [lng, setLng] = useState(null);
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [zoom, setZoom] = useState(12);
+  const [zoom, setZoom] = useState(13);
 
   function getCurrentLoc() {
     if ("geolocation" in navigator) {
@@ -33,11 +43,19 @@ function Map() {
     }
   }
   function setMarkers() {
-    new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map.current);
-    Data.map((c, i) => {
+    new mapboxgl.Marker({ color: "#7893cf" })
+      .setLngLat([lng, lat])
+      .addTo(map.current);
+    dataPharmacy.map((c, i) => {
       const el = document.createElement("div");
       el.className = "pharmacy-marker";
       new mapboxgl.Marker(el).setLngLat([c.boylam, c.enlem]).addTo(map.current);
+    });
+  }
+  function flyTo([lng, lat]) {
+    map.current.flyTo({
+      center: [lng, lat],
+      essential: true, // this animation is considered essential with respect to prefers-reduced-motion
     });
   }
   useEffect(() => {
@@ -50,22 +68,12 @@ function Map() {
     if (lng && lat) {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mlkygn/clsuv1q5d003v01qu1tsycp6f",
+        style: "mapbox://styles/mlkygn/clt1z11d300j201qugd9za6d1",
         center: [lng, lat],
         zoom: zoom,
       });
-      map.on('load', () => {
-
-      setMarkers();
-        map.addLayer({
-          id: 'terrain-data',
-          type: 'line',
-          source: {
-            type: 'vector',
-            url: 'mapbox://mapbox.mapbox-terrain-v2'
-          },
-          'source-layer': 'contour'
-        });
+      map.current.on("load", () => {
+        setMarkers();
       });
       map.current.addControl(
         new mapboxgl.GeolocateControl({
@@ -78,16 +86,14 @@ function Map() {
       );
     }
   });
-  0;
   return (
     <>
       <div>
         <div ref={mapContainer} className="map-container">
-          <Spinner animation="border" variant="primary" />
+          <Spinner animation="border" variant="secondary" />
         </div>
       </div>
     </>
   );
-}
-
+});
 export default Map;
