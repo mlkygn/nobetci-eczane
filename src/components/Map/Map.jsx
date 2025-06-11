@@ -1,4 +1,4 @@
-import React, {
+import {
   useRef,
   useEffect,
   useState,
@@ -13,7 +13,7 @@ import mapboxgl from "mapbox-gl";
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
-const Map = forwardRef(function Map({ dataPharmacy }, ref) {
+const Map = forwardRef(function Map({ filteredList }, ref) {
   useImperativeHandle(ref, () => {
     return {
       flyTo: flyTo,
@@ -27,7 +27,7 @@ const Map = forwardRef(function Map({ dataPharmacy }, ref) {
   const [lng, setLng] = useState(null);
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [zoom, setZoom] = useState(13);
+  const [zoom] = useState(13);
 
   function getCurrentLoc() {
     if ("geolocation" in navigator) {
@@ -43,13 +43,17 @@ const Map = forwardRef(function Map({ dataPharmacy }, ref) {
     }
   }
   function setMarkers() {
+    if (!map.current) return;
     new mapboxgl.Marker({ color: "#7893cf" })
       .setLngLat([lng, lat])
       .addTo(map.current);
-    dataPharmacy.map((c, i) => {
+      filteredList.map((c) => {
       const el = document.createElement("div");
       el.className = "pharmacy-marker";
-      new mapboxgl.Marker(el).setLngLat([c.boylam, c.enlem]).addTo(map.current);
+     
+      new mapboxgl.Marker(el)
+        .setLngLat([c.longitude, c.latitude])
+        .addTo(map.current);
     });
   }
   function flyTo([lng, lat]) {
@@ -86,6 +90,9 @@ const Map = forwardRef(function Map({ dataPharmacy }, ref) {
       );
     }
   });
+  useEffect(() => {
+    setMarkers();
+  }, [filteredList]);
   return (
     <>
       <div>
