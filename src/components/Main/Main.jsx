@@ -60,18 +60,18 @@ function Main() {
   return (
     <main>
       <Container className="py-5">
-        <Row>
-          <Col sm={4}>
             <h1 className="mb-4">Nöbetçi Eczaneler</h1>
+        <Row className="g-3">
+          <Col sm={8}>
+            <Map ref={mapRef} filteredList={filteredList} />
+          </Col>
+          <Col sm={4}>
             <Sidebar
               filterBySearch={filterBySearch}
               filteredList={filteredList}
               flyTo={mapRef?.current?.flyTo}
               isLoaded={isLoaded}
             />
-          </Col>
-          <Col sm={8}>
-            <Map ref={mapRef} filteredList={filteredList} />
           </Col>
         </Row>
       </Container>
