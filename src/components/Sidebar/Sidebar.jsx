@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+
 import "./sidebar.css";
 import searchIcon from "../../assets/search-icon.svg";
 
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import Form from "react-bootstrap/Form";
-import Spinner from "react-bootstrap/Spinner";
 
-import { FaRegClock } from "react-icons/fa";
+import Skeleton from "./Skeleton";
 
 export default function Sidebar({filterBySearch,filteredList, flyTo, isLoaded }) {
   return (
@@ -22,9 +22,9 @@ export default function Sidebar({filterBySearch,filteredList, flyTo, isLoaded })
         <img src={searchIcon} className="search-icon" />
       </Form.Group>
       {!isLoaded ? (
-        <div className="d-flex justify-content-center py-4">
-          <Spinner animation="border" variant="secondary" />
-        </div>
+        Array.from({ length: 10 }).map((_, i) => (
+          <Skeleton key={i} />
+        ))
       ) : (
         <ListGroup variant="flush">
           {filteredList.map((item, index) => (

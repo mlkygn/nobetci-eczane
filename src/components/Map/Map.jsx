@@ -13,7 +13,7 @@ import mapboxgl from "mapbox-gl";
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
-const Map = forwardRef(function Map({ filteredList }, ref) {
+const Map = forwardRef(function Map({ filteredList, setErrorText }, ref) {
   useImperativeHandle(ref, () => {
     return {
       flyTo: flyTo,
@@ -37,6 +37,10 @@ const Map = forwardRef(function Map({ filteredList }, ref) {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        setErrorText(err.message || "Geolocation error occurred.");
       });
     } else {
       console.log("Geolocation is not available in your browser.");

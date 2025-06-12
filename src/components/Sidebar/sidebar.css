@@ -3,7 +3,8 @@
   border-radius: 10px;
   border: none;
   padding: 20px;
-  max-height: calc(80vh - 55px);
+  max-height: 80vh;
+  min-height: 80vh;
   overflow-y: auto;
 }
 .sidebar .form-group {
@@ -54,4 +55,31 @@
   height: 13px;
   margin-right: 5px;
   color: #3e3e3e;
+}
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    left: -150px;
+  }
+  100% {
+    left: 100%;
+  }
 }

@@ -6,10 +6,12 @@ import Col from "react-bootstrap/Col";
 
 import Sidebar from "../Sidebar/Sidebar";
 import Map from "../Map/Map";
+import ErrorMessage from "../Error/ErrorMessage";
 
 function Main() {
   const mapRef = useRef();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [errorText, setErrorText] = useState(null);
   const [dataPharmacy, setdataPharmacy] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [loadInıtialData, setloadInıtialData] = useState(false);
@@ -47,6 +49,9 @@ function Main() {
       .then(response => response.json())
       .then(
         async (result) => {
+          if(!result.status || result.status !== "success") { 
+            setErrorText("Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.");
+          }
           const data = Object.values(result.data);
           setdataPharmacy(data);
           setIsLoaded(true);
@@ -54,16 +59,22 @@ function Main() {
       )
       .catch(error => {
         console.error("API çağrısında hata:", error);
+        setErrorText("Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.");
+        setIsLoaded(true);
       });
   }, []);
 
   return (
     <main>
+      {errorText && (
+        <ErrorMessage message={errorText} onRetry={() => window.location.reload()} />
+       
+      )}
       <Container className="py-5">
             <h1 className="mb-4">Nöbetçi Eczaneler</h1>
         <Row className="g-3">
           <Col sm={8}>
-            <Map ref={mapRef} filteredList={filteredList} />
+            <Map ref={mapRef} filteredList={filteredList} setErrorText={setErrorText} />
           </Col>
           <Col sm={4}>
             <Sidebar
