@@ -39,7 +39,7 @@ function Main() {
     setFilteredList(updatedList);
   };
   useEffect(() => {
-    fetch("https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=Erzincan", {
+    fetch("https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=Erzincani", {
       method: "GET",
       headers: {
         "content-type": "application/json",
@@ -50,7 +50,13 @@ function Main() {
       .then(
         async (result) => {
           if(!result.status || result.status !== "success") { 
-            setErrorText("Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.");
+            return setErrorText("Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.");
+          }
+          if (result.data.length === 0) {
+            setErrorText("Bu konum için eczane verisi bulunamadı. Lütfen daha sonra tekrar deneyin.");
+            setIsLoaded(true);
+            return;
+            
           }
           const data = Object.values(result.data);
           setdataPharmacy(data);

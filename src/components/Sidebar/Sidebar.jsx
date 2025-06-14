@@ -2,6 +2,7 @@
 
 import "./sidebar.css";
 import searchIcon from "../../assets/search-icon.svg";
+import notFoundIcon from "../../assets/not-found-icon.png";
 
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -9,7 +10,12 @@ import Form from "react-bootstrap/Form";
 
 import Skeleton from "./Skeleton";
 
-export default function Sidebar({filterBySearch,filteredList, flyTo, isLoaded }) {
+export default function Sidebar({
+  filterBySearch,
+  filteredList,
+  flyTo,
+  isLoaded,
+}) {
   return (
     <Card className="sidebar">
       <Form.Group className="form-group mb-3">
@@ -22,9 +28,15 @@ export default function Sidebar({filterBySearch,filteredList, flyTo, isLoaded })
         <img src={searchIcon} className="search-icon" />
       </Form.Group>
       {!isLoaded ? (
-        Array.from({ length: 10 }).map((_, i) => (
-          <Skeleton key={i} />
-        ))
+        Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} />)
+      ) : filteredList.length === 0 ? (
+        <div className="text-center py-5">
+          <img src={notFoundIcon} className="w-50" />
+          <h4>Nöbetçi Eczane Bulunamadı</h4>
+          <p className="text-muted">
+            Seçtiğiniz bölgede nöbetçi eczane bulunmamaktadır
+          </p>
+        </div>
       ) : (
         <ListGroup variant="flush">
           {filteredList.map((item, index) => (
