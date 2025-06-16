@@ -11,7 +11,8 @@ import Form from "react-bootstrap/Form";
 import Skeleton from "./Skeleton";
 
 export default function Sidebar({
-  filterBySearch,
+  filters,
+  setFilters,
   filteredList,
   flyTo,
   isLoaded,
@@ -20,7 +21,7 @@ export default function Sidebar({
     <Card className="sidebar">
       <Form.Group className="form-group mb-3">
         <Form.Control
-          onChange={filterBySearch}
+           onChange={e => setFilters({ ...filters, searchTerm: e.target.value })}
           placeholder="Eczane/Adres Ara"
           aria-label="Username"
           aria-describedby="basic-addon1"

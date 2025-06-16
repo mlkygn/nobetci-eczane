@@ -1,6 +1,6 @@
 .map-container {
   width: 100%;
-  height: 80vh;
+  height: calc(100vh - 140px);
   border-radius: 10px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -15,4 +15,10 @@
   height: 30px;
   border-radius: 50%;
   cursor: pointer;
+}
+@media screen and (max-width: 768px) {
+  .map-container {
+    height: calc(50vh - 90px);
+  }
+  
 }

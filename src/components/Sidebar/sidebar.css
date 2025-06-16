@@ -3,9 +3,22 @@
   border-radius: 10px;
   border: none;
   padding: 20px;
-  max-height: 80vh;
-  min-height: 80vh;
+  height: calc(100vh - 140px);
   overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: #b7b7b7;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #9a9a9a;
 }
 .sidebar .form-group {
   position: relative;
@@ -14,14 +27,14 @@
   padding: 10px 15px;
   border-radius: 5px;
   background-color: #eff0f6;
-  border: none;
+  border-color: #d2d7ef;
   padding-left: 40px;
 }
 .sidebar .form-group .search-icon {
   width: 20px;
   height: 20px;
   left: 10px;
-  top: 8px;
+  top: 11px;
   position: absolute;
 }
 .sidebar .form-control::placeholder {
@@ -32,29 +45,25 @@
   --bs-list-group-color: #3e3e3e;
   cursor: pointer;
   transition: 0.3s;
-  border-radius: 5px;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  margin-bottom: 9px;
 }
 .sidebar .list-group-item:hover {
   background-color: #ececec;
 }
 .sidebar .list-group-item .name {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: bold;
 }
 .sidebar .list-group-item .district {
   font-size: 13px;
+  color: #9d9d9d;
+}
+.sidebar .list-group-item .address {
+  font-size: 12px;
   font-weight: 300;
-  color: #a2a8ca;
-}
-.sidebar .list-group-item .time {
-  font-size: 11px;
-  color: #858aa2;
-}
-.sidebar .list-group-item .time .icon {
-  width: 13px;
-  height: 13px;
-  margin-right: 5px;
-  color: #3e3e3e;
+  color: #a4a4a4;
 }
 .skeleton {
   background-color: #e0e0e0;
@@ -71,7 +80,12 @@
   left: -150px;
   height: 100%;
   width: 150px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
   animation: loading-shimmer 1.5s infinite;
 }
 
@@ -81,5 +95,21 @@
   }
   100% {
     left: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar {
+    height: calc(50vh - 90px);
+    padding: 10px;
+  }
+  .sidebar .list-group-item {
+    font-size: 14px;
+  }
+  .sidebar .list-group-item .name {
+    font-size: 14px;
+  }
+  .sidebar .list-group-item .district {
+    font-size: 12px;
   }
 }

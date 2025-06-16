@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
 
 import Sidebar from "../Sidebar/Sidebar";
 import Map from "../Map/Map";
@@ -14,80 +15,130 @@ function Main() {
   const [errorText, setErrorText] = useState(null);
   const [dataPharmacy, setdataPharmacy] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
+  const [filters, setFilters] = useState({
+    searchTerm: "",
+    sortField: "pharmacyName", // name, district, address
+    sortOrder: "asc", // asc or desc
+  });
   const [loadInıtialData, setloadInıtialData] = useState(false);
-
 
   useEffect(() => {
     if (!loadInıtialData && dataPharmacy.length > 0) {
       setFilteredList(dataPharmacy);
       setloadInıtialData(true);
     }
-  });
-  const filterBySearch = (event) => {
-    // Access input value
-    const query = event.target.value;
-    // Create copy of item list
-    var updatedList = [...dataPharmacy];
-    // Include all elements which includes the search query
-    updatedList = updatedList.filter(
-      (item) =>
-        item.pharmacyName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        item.district.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        item.address.toLowerCase().indexOf(query.toLowerCase()) !== -1
-    );
-    // Trigger render with updated values
-    setFilteredList(updatedList);
-  };
+  }, [loadInıtialData, dataPharmacy]);
+
   useEffect(() => {
-    fetch("https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=Erzincani", {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        "authorization": "Bearer rjRbArPZQRDSOfmlUp9flTXe33f11mUEFZ3BwaFDRltGwjuPaiJzILoQme6P" 
-      }
-    })
-      .then(response => response.json())
-      .then(
-        async (result) => {
-          if(!result.status || result.status !== "success") { 
-            return setErrorText("Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.");
-          }
-          if (result.data.length === 0) {
-            setErrorText("Bu konum için eczane verisi bulunamadı. Lütfen daha sonra tekrar deneyin.");
-            setIsLoaded(true);
-            return;
-            
-          }
-          const data = Object.values(result.data);
-          setdataPharmacy(data);
-          setIsLoaded(true);
+    fetch(
+      "https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=Erzincan",
+      {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+          authorization:
+            "Bearer rjRbArPZQRDSOfmlUp9flTXe33f11mUEFZ3BwaFDRltGwjuPaiJzILoQme6P",
         },
-      )
-      .catch(error => {
+      }
+    )
+      .then((response) => response.json())
+      .then(async (result) => {
+        if (!result.status || result.status !== "success") {
+          return setErrorText(
+            "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin."
+          );
+        }
+        if (result.data.length === 0) {
+          setErrorText(
+            "Bu konum için eczane verisi bulunamadı. Lütfen daha sonra tekrar deneyin."
+          );
+          setIsLoaded(true);
+          return;
+        }
+        const data = Object.values(result.data);
+        setdataPharmacy(data);
+        setIsLoaded(true);
+      })
+      .catch((error) => {
         console.error("API çağrısında hata:", error);
-        setErrorText("Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.");
+        setErrorText(
+          "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin."
+        );
         setIsLoaded(true);
       });
   }, []);
 
+  useEffect(() => {
+    const result = dataPharmacy
+      .filter((item) => {
+        const term = filters.searchTerm.toLowerCase();
+        return (
+          item.pharmacyName.toLowerCase().includes(term) ||
+          item.district.toLowerCase().includes(term) ||
+          item.address.toLowerCase().includes(term)
+        );
+      })
+      .sort((a, b) => {
+        const fieldA = a[filters.sortField].toLowerCase();
+        const fieldB = b[filters.sortField].toLowerCase();
+        return filters.sortOrder === "asc"
+          ? fieldA.localeCompare(fieldB)
+          : fieldB.localeCompare(fieldA);
+      });
+
+    setFilteredList(result);
+  }, [filters, dataPharmacy]);
+
+  const handleSortChange = (e) => {
+    const field = e.target.value;
+    const order =
+      e.target.options[e.target.selectedIndex].getAttribute("data-order");
+
+    setFilters((prev) => ({
+      ...prev,
+      sortField: field,
+      sortOrder: order,
+    }));
+  };
   return (
     <main>
       {errorText && (
-        <ErrorMessage message={errorText} onRetry={() => window.location.reload()} />
-       
+        <ErrorMessage
+          message={errorText}
+          onRetry={() => window.location.reload()}
+        />
       )}
-      <Container className="py-5">
-            <h1 className="mb-4">Nöbetçi Eczaneler</h1>
-        <Row className="g-3">
-          <Col sm={8}>
-            <Map ref={mapRef} filteredList={filteredList} setErrorText={setErrorText} />
+      <Container className="py-md-5 py-2">
+        <Row className="mb-md-4 mb-2">
+          <Col>
+            <h1>Nöbetçi Eczaneler</h1>
           </Col>
+          <Col>
+            <Form.Select onChange={handleSortChange}>
+              <option value="pharmacyName" data-order="asc">
+                İsme göre artan
+              </option>
+              <option value="pharmacyName" data-order="desc">
+                İsme göre azalan
+              </option>
+            </Form.Select>
+          </Col>
+        </Row>
+        <Row className="g-3">
           <Col sm={4}>
             <Sidebar
-              filterBySearch={filterBySearch}
+              filters={filters}
+              setFilters={setFilters}
               filteredList={filteredList}
               flyTo={mapRef?.current?.flyTo}
               isLoaded={isLoaded}
+            />
+          </Col>
+          <Col sm={8}>
+            <Map
+              ref={mapRef}
+              filteredList={filteredList}
+              setErrorText={setErrorText}
             />
           </Col>
         </Row>
