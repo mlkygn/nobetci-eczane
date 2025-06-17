@@ -2,6 +2,7 @@ import {
   useRef,
   useEffect,
   useState,
+  useCallback,
   forwardRef,
   useImperativeHandle,
 } from "react";
@@ -23,25 +24,78 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
   const [lng, setLng] = useState(null);
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [zoom] = useState(13);
+  const [zoom] = useState(15);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  function setMarkers() {
-    if (!map.current) return;
-    new mapboxgl.Marker({ color: "#7893cf" })
-      .setLngLat([lng, lat])
-      .addTo(map.current);
-    filteredList.map((c) => {
-      const el = document.createElement("div");
-      el.className = "pharmacy-marker";
+  // Marker'ları ayarlama fonksiyonu (useCallback ile optimize edildi)
+  const setMarkers = useCallback(() => {
+    if (!map.current || !isMapLoaded) return;
 
-      new mapboxgl.Marker(el)
-        .setLngLat([c.longitude, c.latitude])
-        .addTo(map.current);
-    });
-  }
+    // GeoJSON verisini hazırla
+    const geoJsonData = {
+      type: "FeatureCollection",
+      features: filteredList.map((p) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [p.longitude, p.latitude],
+        },
+        properties: {
+          title: p.pharmacyName,
+        },
+      })),
+    };
+
+    // Kaynak zaten varsa güncelle, yoksa yeni kaynak ekle
+    const source = map.current.getSource("pharmacies");
+    if (source) {
+      source.setData(geoJsonData);
+    } else {
+      map.current.loadImage(
+        "/pharmacy-marker.png",
+        (error, image) => {
+          if (error) throw error;
+          map.current.addImage("custom-marker", image);
+          map.current.addSource("pharmacies", {
+            type: "geojson",
+            data: geoJsonData,
+          });
+          // Marker katmanı
+          map.current.addLayer({
+            id: "pharmacy-markers",
+            type: "symbol",
+            source: "pharmacies",
+            layout: {
+              "icon-image": "custom-marker",
+              "icon-size": 1,
+              "icon-allow-overlap": true
+            }
+          });
+          map.current.addLayer({
+            id: "pharmacy-labels",
+            type: "symbol",
+            source: "pharmacies",
+            layout: {
+              "text-field": ["get", "title"],
+              "text-size": 12,
+              "text-offset": [0, 1],
+              "text-anchor": "top",
+            },
+            paint: {
+              "text-color": "#3a7bd5",
+              "text-halo-color": "#ffffff",
+              "text-halo-width": 2,
+            },
+          });
+        }
+      );
+    }
+  }, [filteredList, isMapLoaded]);
+
   function flyTo([lng, lat]) {
     map.current.flyTo({
       center: [lng, lat],
+      minZoom:10,
       essential: true, // this animation is considered essential with respect to prefers-reduced-motion
     });
   }
@@ -57,6 +111,12 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
         zoom: zoom,
       });
       map.current.on("load", () => {
+        setIsMapLoaded(true);
+        new mapboxgl.Marker({ color: "#7893cf" })
+          .setLngLat([lng, lat])
+          .addTo(map.current);
+
+        // İlk işaretlemeleri ayarla
         setMarkers();
       });
       map.current.addControl(
@@ -69,10 +129,13 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
         })
       );
     }
-  });
+  }, [lat, lng, userLoc, zoom, setMarkers]);
   useEffect(() => {
-    setMarkers();
-  }, [filteredList]);
+    if (isMapLoaded) {
+      setMarkers();
+    }
+  }, [filteredList, isMapLoaded, setMarkers]);
+
   return (
     <>
       <div>

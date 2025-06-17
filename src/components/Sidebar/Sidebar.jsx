@@ -21,7 +21,9 @@ export default function Sidebar({
     <Card className="sidebar">
       <Form.Group className="form-group mb-3">
         <Form.Control
-           onChange={e => setFilters({ ...filters, searchTerm: e.target.value })}
+          onChange={(e) =>
+            setFilters({ ...filters, searchTerm: e.target.value })
+          }
           placeholder="Eczane/Adres Ara"
           aria-label="Username"
           aria-describedby="basic-addon1"
@@ -45,7 +47,12 @@ export default function Sidebar({
               key={index}
               onClick={() => flyTo([item.longitude, item.latitude])}
             >
-              <div className="name">{item.pharmacyName}</div>
+              <div className="d-flex">
+                <div className="name">{item.pharmacyName}</div>
+                {item.distance && (
+                  <div className="distance">mesafe: <strong>{item.distance} km</strong></div>
+                )}
+              </div>
               <div className="district">{item.district}</div>
               <div className="address">{item.address}</div>
               {/* <div className="time">

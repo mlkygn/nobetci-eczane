@@ -13,7 +13,7 @@ import ErrorMessage from "../Error/ErrorMessage";
 function Main() {
   const mapRef = useRef();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [errorText, setErrorText] = useState(null);
+  const [errorText, setErrorText] = useState([]);
   const [dataPharmacy, setdataPharmacy] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [filters, setFilters] = useState({
@@ -36,28 +36,33 @@ function Main() {
   }, [loadInıtialData, dataPharmacy]);
 
   useEffect(() => {
-    fetch(
-      "https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=Erzincan",
-      {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-          authorization:
-            "Bearer rjRbArPZQRDSOfmlUp9flTXe33f11mUEFZ3BwaFDRltGwjuPaiJzILoQme6P",
-        },
-      }
-    )
+    const isLocalhost = window.location.hostname === "localhost";
+    const url = isLocalhost
+      ? "/fake_data.json"
+      : "https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=Erzincan";
+    fetch(url, {
+      method: "GET",
+      headers: isLocalhost
+        ? {}
+        : {
+            "content-type": "application/json",
+            authorization:
+              "Bearer An5wBqTNqRZ9gKgtfBeJtulcKs4A6JmKVkSv16s7oVkR8vKh7dHje2NFMw6E",
+          },
+    })
       .then((response) => response.json())
       .then(async (result) => {
         if (!result.status || result.status !== "success") {
-          return setErrorText(
-            "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin."
-          );
+          return setErrorText((prev) => [
+            ...prev,
+            "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.",
+          ]);
         }
         if (result.data.length === 0) {
-          setErrorText(
-            "Bu konum için eczane verisi bulunamadı. Lütfen daha sonra tekrar deneyin."
-          );
+          setErrorText((prev) => [
+            ...prev,
+            "Bu konum için eczane verisi bulunamadı. Lütfen daha sonra tekrar deneyin.",
+          ]);
           setIsLoaded(true);
           return;
         }
@@ -67,9 +72,10 @@ function Main() {
       })
       .catch((error) => {
         console.error("API çağrısında hata:", error);
-        setErrorText(
-          "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin."
-        );
+        setErrorText((prev) => [
+          ...prev,
+          "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.",
+        ]);
         setIsLoaded(true);
       });
   }, []);
@@ -102,7 +108,7 @@ function Main() {
 
         return 0;
       });
-
+    console.log("Filtered List:", result);
     setFilteredList(result);
   }, [filters, dataPharmacy]);
 
@@ -111,41 +117,48 @@ function Main() {
       console.log("Tarayıcı konum servisini desteklemiyor.");
       return;
     }
+    // İlk konumu al
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const initialLoc = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+        prevLocRef.current = initialLoc;
+        setuserLoc(initialLoc);
+      },
+      (error) => {
+        console.error("İlk konum alınamadı:", error.message);
+        setErrorText((prev) => [...prev, "İlk konum alınamadı."]);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      }
+    );
+    // Sonraki konum değişikliklerini izle
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const currentLoc = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         };
+
         const prevLoc = prevLocRef.current;
         if (
           prevLoc &&
           currentLoc.latitude === prevLoc.latitude &&
           currentLoc.longitude === prevLoc.longitude
         ) {
-          return;
+          return; // aynı konumsa işleme gerek yok
         }
+
         prevLocRef.current = currentLoc;
         setuserLoc(currentLoc);
-        if (dataPharmacy.length > 0) {
-          const updatedList = dataPharmacy.map((pharmacy) => {
-            const distance = getDistance(
-              currentLoc,
-              {
-                latitude: pharmacy.latitude,
-                longitude: pharmacy.longitude,
-              },
-              1 // 1 meter accuracy
-            );
-            return { ...pharmacy, distance };
-          });
-          setdataPharmacy(updatedList);
-          console.log("datas:", updatedList);
-        }
       },
       (error) => {
         console.error("Konum alınamadı:", error.message);
-        setErrorText(error.message || "Konum Alınırken bir hata oluştu.");
+        setErrorText((prev) => [...prev, "Konum Alınırken bir hata oluştu."]);
       },
       {
         enableHighAccuracy: false,
@@ -156,8 +169,20 @@ function Main() {
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [dataPharmacy]);
+  }, []);
+  useEffect(() => {
+    if (!userLoc || dataPharmacy.length === 0) return;
 
+    const updatedList = dataPharmacy.map((pharmacy) => {
+      const distance = getDistance(userLoc, {
+        latitude: pharmacy.latitude,
+        longitude: pharmacy.longitude,
+      });
+      return { ...pharmacy, distance };
+    });
+
+    setdataPharmacy(updatedList);
+  }, [userLoc]);
   const handleSortChange = (e) => {
     const field = e.target.value;
     const order =
@@ -171,9 +196,9 @@ function Main() {
   };
   return (
     <main>
-      {errorText && (
+      {errorText && errorText.length > 0 && (
         <ErrorMessage
-          message={errorText}
+          messages={errorText}
           onRetry={() => window.location.reload()}
         />
       )}

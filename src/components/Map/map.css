@@ -8,14 +8,6 @@
   align-items: center;
   background-color: #fff;
 }
-.pharmacy-marker {
-  background-image: url("../../assets/pharmacy-marker.svg");
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-}
 @media screen and (max-width: 768px) {
   .map-container {
     height: calc(50vh - 90px);
