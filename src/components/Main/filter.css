@@ -1,0 +1,15 @@
+.filter-bar {
+  font-size: 14px;
+}
+.filter-box {
+  display: flex;
+  align-items: center;
+  padding: 5px 5px 5px 15px;
+  background-color: #fff;
+  border-radius: 5px;
+  height: 100%;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+}
+.filter-box .form-select {
+  border: none;
+}

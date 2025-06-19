@@ -1,4 +1,3 @@
-import React from "react";
 import Container from "react-bootstrap/Container";
 import BootstrapNavbar from "react-bootstrap/Navbar";
 
@@ -9,6 +8,10 @@ function Navbar() {
     <>
       <BootstrapNavbar bg="dark" data-bs-theme="dark">
         <Container>
+          <BootstrapNavbar.Text>
+            {" "}
+            <h1>Nöbetçi Eczaneler</h1>
+          </BootstrapNavbar.Text>
           <BootstrapNavbar.Brand href="#home">
             <img
               alt=""
