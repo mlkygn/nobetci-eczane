@@ -8,9 +8,13 @@
   align-items: center;
   background-color: #fff;
 }
+.map-container .geolocate-btn {
+  display: flex;
+  background: rgb(255, 255, 255);
+  padding: 6px;
+}
 @media screen and (max-width: 768px) {
   .map-container {
     height: calc(50vh - 90px);
   }
-  
 }

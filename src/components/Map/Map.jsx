@@ -15,24 +15,107 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
 const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
-  useImperativeHandle(ref, () => {
-    return {
-      flyTo: flyTo,
-    };
-  });
-  const [lat, setLat] = useState(null);
-  const [lng, setLng] = useState(null);
   const mapContainer = useRef(null);
   const map = useRef(null);
   const userMarkerRef = useRef(null);
-  const [zoom] = useState(15);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  // Marker'ları ayarlama fonksiyonu (useCallback ile optimize edildi)
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [zoom] = useState(15);
+
+  useImperativeHandle(ref, () => ({
+    flyTo,
+  }));
+
+  // flyTo fonksiyonu
+  function flyTo([lng, lat]) {
+    if (!map.current) return;
+    map.current.flyTo({
+      center: [lng, lat],
+      minZoom: 10,
+      essential: true,
+    });
+  }
+
+  // Konumuma Git kontrolü
+  const createLocateControl = useCallback(
+    () => ({
+      onAdd() {
+        const btn = document.createElement("button");
+        btn.className = "mapboxgl-ctrl-icon geolocate-btn";
+        btn.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 0c17.7 0 32 14.3 32 32l0 34.7C368.4 80.1 431.9 143.6 445.3 224l34.7 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-34.7 0C431.9 368.4 368.4 431.9 288 445.3l0 34.7c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-34.7C143.6 431.9 80.1 368.4 66.7 288L32 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l34.7 0C80.1 143.6 143.6 80.1 224 66.7L224 32c0-17.7 14.3-32 32-32zM128 256a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zm128-80a80 80 0 1 1 0 160 80 80 0 1 1 0-160z"/></svg>';
+        btn.title = "Konumuma Git";
+
+        btn.onclick = () => {
+          const marker = userMarkerRef.current;
+          if (marker) {
+            const lngLat = marker.getLngLat();
+            map.current.flyTo({
+              center: [lngLat.lng, lngLat.lat],
+              zoom: 14,
+              speed: 1.2,
+              curve: 1.4,
+            });
+          } else {
+            alert("Konum bilgisi alınamadı.");
+          }
+        };
+
+        const container = document.createElement("div");
+        container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+        container.appendChild(btn);
+        return container;
+      },
+      onRemove() {},
+      getDefaultPosition() {
+        return "top-right";
+      },
+    }),
+    []
+  );
+
+  // Haritayı oluştur ve başlat
+  useEffect(() => {
+    if (map.current || !userLoc.latitude || !userLoc.longitude) return;
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mlkygn/clt1z11d300j201qugd9za6d1",
+      center: [userLoc.longitude, userLoc.latitude],
+      zoom,
+    });
+
+    map.current.on("load", () => {
+      setIsMapLoaded(true);
+
+      // Kullanıcı marker'ı oluştur
+      const userMarker = new mapboxgl.Marker({ color: "#7893cf" })
+        .setLngLat([userLoc.longitude, userLoc.latitude])
+        .addTo(map.current);
+      userMarkerRef.current = userMarker;
+
+      // Konumuma Git butonunu ekle
+      map.current.addControl(createLocateControl());
+
+      // İlk eczane marker'larını ayarla
+      setMarkers();
+    });
+  }, [userLoc, zoom, createLocateControl]);
+
+  // userLoc değiştiğinde marker'ı güncelle
+  useEffect(() => {
+    if (!isMapLoaded || !userLoc.latitude || !userLoc.longitude) return;
+
+    const newCoords = [userLoc.longitude, userLoc.latitude];
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setLngLat(newCoords);
+    }
+  }, [userLoc, isMapLoaded]);
+
+  // Eczane marker'larını güncelle
   const setMarkers = useCallback(() => {
     if (!map.current || !isMapLoaded) return;
 
-    // GeoJSON verisini hazırla
     const geoJsonData = {
       type: "FeatureCollection",
       features: filteredList.map((p) => ({
@@ -47,7 +130,6 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
       })),
     };
 
-    // Kaynak zaten varsa güncelle, yoksa yeni kaynak ekle
     const source = map.current.getSource("pharmacies");
     if (source) {
       source.setData(geoJsonData);
@@ -59,7 +141,6 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
           type: "geojson",
           data: geoJsonData,
         });
-        // Marker katmanı
         map.current.addLayer({
           id: "pharmacy-markers",
           type: "symbol",
@@ -89,102 +170,21 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
       });
     }
   }, [filteredList, isMapLoaded]);
-  const createLocateControl = (map, marker) => ({
-    onAdd() {
-      const btn = document.createElement("button");
-      btn.className = "mapboxgl-ctrl-icon";
-      btn.innerText = "📍";
-      btn.title = "Konumuma Git";
-      btn.style.cursor = "pointer";
-      btn.style.background = "#fff";
-      btn.style.border = "none";
-      btn.style.padding = "6px";
-      btn.style.fontSize = "18px";
 
-      btn.onclick = () => {
-        const lngLat = marker?.getLngLat?.();
-        if (lngLat) {
-          map.flyTo({
-            center: [lngLat.lng, lngLat.lat],
-            zoom: 14,
-            speed: 1.2,
-            curve: 1.4,
-          });
-        } else {
-          alert("Konum bilgisi alınamadı.");
-        }
-      };
-
-      const container = document.createElement("div");
-      container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
-      container.appendChild(btn);
-      return container;
-    },
-    onRemove() {},
-    getDefaultPosition() {
-      return "top-right";
-    },
-  });
-  function flyTo([lng, lat]) {
-    map.current.flyTo({
-      center: [lng, lat],
-      minZoom: 10,
-      essential: true, // this animation is considered essential with respect to prefers-reduced-motion
-    });
-  }
+  // filteredList değiştiğinde marker'ları güncelle
   useEffect(() => {
-    if (map.current) return; // initialize map only once
-    setLat(userLoc.latitude);
-    setLng(userLoc.longitude);
-    if (lng && lat) {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: "mapbox://styles/mlkygn/clt1z11d300j201qugd9za6d1",
-        center: [lng, lat],
-        zoom: zoom,
-      });
-
-      map.current.on("load", () => {
-        setIsMapLoaded(true);
-        const userMarker = new mapboxgl.Marker({ color: "#7893cf" })
-          .setLngLat([lng, lat])
-          .addTo(map.current);
-        userMarkerRef.current = userMarker;
-        map.current.addControl(createLocateControl(map.current, userMarker));
-        // İlk işaretlemeleri ayarla
-        setMarkers();
-      });
-    }
-  }, [lat, lng, userLoc, zoom, setMarkers]);
-  useEffect(() => {
-    if (isMapLoaded) {
-      setMarkers();
-    }
+    setMarkers();
   }, [filteredList, isMapLoaded, setMarkers]);
-  useEffect(() => {
-    if (!isMapLoaded || !userLoc.latitude || !userLoc.longitude) return;
 
-    const newCoords = [userLoc.longitude, userLoc.latitude];
-    if (userMarkerRef.current) {
-      userMarkerRef.current.setLngLat(newCoords);
-    } else {
-      const marker = new mapboxgl.Marker({ color: "#7893cf" })
-        .setLngLat(newCoords)
-        .addTo(map.current);
-      userMarkerRef.current = marker;
-
-      // Konumuma Git butonunu sadece ilk kez marker oluşunca ekle
-      map.current.addControl(createLocateControl(map.current, marker));
-    }
-  }, [userLoc, isMapLoaded]);
   return (
     <>
       <div>
         <div ref={mapContainer} className="map-container">
-          <Spinner animation="border" variant="secondary" />
+          {!isMapLoaded && <Spinner animation="border" variant="secondary" />}
         </div>
       </div>
     </>
   );
 });
+
 export default Map;
