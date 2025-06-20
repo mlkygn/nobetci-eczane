@@ -31,7 +31,7 @@ function FilterBar({ filters, setFilters, dataDistricts, userLoc }) {
     }));
   };
   return (
-    <div className="filter-bar mb-4">
+    <div className="filter-bar ">
       <Row>
         <Col>
           {/* Sıralama */}

@@ -201,14 +201,16 @@ function Main() {
         />
       )}
       <Container className="py-md-5 py-2">
-        <FilterBar
-          filters={filters}
-          setFilters={setFilters}
-          dataDistricts={dataDistricts}
-          userLoc={userLoc}
-        />
         <Row className="g-3">
-          <Col sm={4}>
+          <Col xs={12}>
+            <FilterBar
+              filters={filters}
+              setFilters={setFilters}
+              dataDistricts={dataDistricts}
+              userLoc={userLoc}
+            />
+          </Col>
+          <Col xs={{ span: 12 }} md={{ span: 4 }}>
             <Sidebar
               filters={filters}
               setFilters={setFilters}
@@ -217,7 +219,10 @@ function Main() {
               isLoaded={isLoaded}
             />
           </Col>
-          <Col sm={8}>
+          <Col
+            xs={{ span: 12, order: "first" }}
+            md={{ span: 8, order: "last" }}
+          >
             <Map ref={mapRef} userLoc={userLoc} filteredList={filteredList} />
           </Col>
         </Row>

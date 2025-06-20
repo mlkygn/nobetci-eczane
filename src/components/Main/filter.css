@@ -8,8 +8,15 @@
   background-color: #fff;
   border-radius: 5px;
   height: 100%;
+  min-height: 55px;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
 }
 .filter-box .form-select {
   border: none;
+}
+@media screen and (max-width: 768px) {
+  .filter-bar > .row {
+    flex-direction: column;
+    --bs-gutter-y: 10px;
+  }
 }
