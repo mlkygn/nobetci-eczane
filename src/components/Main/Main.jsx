@@ -11,13 +11,19 @@ import ErrorMessage from "../Error/ErrorMessage";
 import FilterBar from "../FilterBar/FilterBar";
 import { usePharmacyFilter } from "../../hooks/usePharmacyFilter";
 
+import { useErrorHandler } from "../../hooks/useErrorHandler";
+import { ERROR_CATALOG } from "../../constants/errorCatalog";
+
 import "./filter.css";
 
 function Main() {
   const mapRef = useRef();
   const apiUrl = "An5wBqTNqRZ9gKgtfBeJtulcKs4A6JmKVkSv16s7oVkR8vKh7dHje2NFMw6E";
   const [isLoaded, setIsLoaded] = useState(false);
-  const [errorText, setErrorText] = useState([]);
+
+  // eslint-disable-next-line no-unused-vars
+  const { errors, addError, removeError, clearErrors } = useErrorHandler();
+
   const [dataDistricts, setDataDistricts] = useState([]);
   const [dataPharmacy, setdataPharmacy] = useState([]);
   const [userLoc, setuserLoc] = useState({
@@ -53,30 +59,22 @@ function Main() {
       .then((response) => response.json())
       .then(async (result) => {
         if (!result.status || result.status !== "success") {
-          return setErrorText((prev) => [
-            ...prev,
-            "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.",
-          ]);
+          return addError(ERROR_CATALOG.FETCH_PHARMACY_FAIL);
         }
         if (result.data.length === 0) {
-          setErrorText((prev) => [
-            ...prev,
-            "Bu konum için eczane verisi bulunamadı. Lütfen daha sonra tekrar deneyin.",
-          ]);
+          addError(ERROR_CATALOG.NO_PHARMACY_DATA);
           setIsLoaded(true);
           return;
         }
         const data = Object.values(result.data);
+        removeError(ERROR_CATALOG.FETCH_PHARMACY_FAIL.id);
         setdataPharmacy(data);
         setIsLoaded(true);
         getDistricts();
       })
       .catch((error) => {
         console.error("API çağrısında hata:", error);
-        setErrorText((prev) => [
-          ...prev,
-          "Eczane verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.",
-        ]);
+        addError(ERROR_CATALOG.FETCH_PHARMACY_FAIL);
         setIsLoaded(true);
       });
   }, []);
@@ -93,12 +91,12 @@ function Main() {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         };
+        removeError(ERROR_CATALOG.LOCATION_FAIL.id);
         prevLocRef.current = initialLoc;
         setuserLoc(initialLoc);
       },
-      (error) => {
-        console.error("İlk konum alınamadı:", error.message);
-        setErrorText((prev) => [...prev, "İlk konum alınamadı."]);
+      () => {
+        addError(ERROR_CATALOG.LOCATION_FAIL);
       },
       {
         enableHighAccuracy: true,
@@ -108,6 +106,7 @@ function Main() {
     // Sonraki konum değişikliklerini izle
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
+        removeError(ERROR_CATALOG.LOCATION_FAIL.id);
         const currentLoc = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -127,7 +126,7 @@ function Main() {
       },
       (error) => {
         console.error("Konum alınamadı:", error.message);
-        setErrorText((prev) => [...prev, "Konum Alınırken bir hata oluştu."]);
+        addError(ERROR_CATALOG.LOCATION_FAIL);
       },
       {
         enableHighAccuracy: false,
@@ -168,35 +167,28 @@ function Main() {
       .then((response) => response.json())
       .then(async (result) => {
         if (!result.status || result.status !== "success") {
-          return setErrorText((prev) => [
-            ...prev,
-            "İlçe verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.",
-          ]);
+          return addError(ERROR_CATALOG.FETCH_DISTRICT_FAIL);
         }
         if (result.data.length === 0) {
-          setErrorText((prev) => [
-            ...prev,
-            "Bu konum için ilçe verisi bulunamadı. Lütfen daha sonra tekrar deneyin.",
-          ]);
+          addError(ERROR_CATALOG.NO_DISTRICT_DATA);
           return;
         }
+        removeError(ERROR_CATALOG.NO_DISTRICT_DATA.id);
+        removeError(ERROR_CATALOG.FETCH_DISTRICT_FAIL.id);
         const data = Object.values(result.data);
         setDataDistricts(data);
       })
       .catch((error) => {
         console.error("API çağrısında hata:", error);
-        setErrorText((prev) => [
-          ...prev,
-          "İlçe verileri yüklenirken hata oluştu. Lütfen tekrar deneyin.",
-        ]);
+        addError(ERROR_CATALOG.FETCH_DISTRICT_FAIL);
       });
   };
 
   return (
     <main>
-      {errorText && errorText.length > 0 && (
+      {errors.length > 0 && (
         <ErrorMessage
-          messages={errorText}
+          messages={errors.map((e) => e.message)}
           onRetry={() => window.location.reload()}
         />
       )}
@@ -223,7 +215,12 @@ function Main() {
             xs={{ span: 12, order: "first" }}
             md={{ span: 8, order: "last" }}
           >
-            <Map ref={mapRef} userLoc={userLoc} filteredList={filteredList} filters={filters} />
+            <Map
+              ref={mapRef}
+              userLoc={userLoc}
+              filteredList={filteredList}
+              filters={filters}
+            />
           </Col>
         </Row>
       </Container>
