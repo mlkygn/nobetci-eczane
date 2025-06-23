@@ -223,7 +223,7 @@ function Main() {
             xs={{ span: 12, order: "first" }}
             md={{ span: 8, order: "last" }}
           >
-            <Map ref={mapRef} userLoc={userLoc} filteredList={filteredList} />
+            <Map ref={mapRef} userLoc={userLoc} filteredList={filteredList} filters={filters} />
           </Col>
         </Row>
       </Container>

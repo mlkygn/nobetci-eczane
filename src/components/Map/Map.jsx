@@ -10,11 +10,12 @@ import Spinner from "react-bootstrap/Spinner";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.css";
 import mapboxgl from "mapbox-gl";
+import * as turf from "@turf/turf";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
-const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
+const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const userMarkerRef = useRef(null);
@@ -31,7 +32,7 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
     if (!map.current) return;
     map.current.flyTo({
       center: [lng, lat],
-      minZoom: 10,
+      minZoom: zoom,
       essential: true,
     });
   }
@@ -52,7 +53,7 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
             const lngLat = marker.getLngLat();
             map.current.flyTo({
               center: [lngLat.lng, lngLat.lat],
-              zoom: 14,
+              zoom: zoom,
               speed: 1.2,
               curve: 1.4,
             });
@@ -82,7 +83,7 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
       container: mapContainer.current,
       style: "mapbox://styles/mlkygn/clt1z11d300j201qugd9za6d1",
       center: [userLoc.longitude, userLoc.latitude],
-      zoom,
+      zoom: 6,
     });
 
     map.current.on("load", () => {
@@ -99,6 +100,30 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
 
       // İlk eczane marker'larını ayarla
       setMarkers();
+
+      // Create a circle polygon using Turf.js
+      const circle = turf.circle(
+        [userLoc.longitude, userLoc.latitude],
+        filters.maxDistance,
+        { units: "kilometers" }
+      );
+
+      // Add the circle polygon as a source
+      map.current.addSource("circle", {
+        type: "geojson",
+        data: circle,
+      });
+
+      // Add a fill layer to display the circle
+      map.current.addLayer({
+        id: "circle-fill",
+        type: "fill",
+        source: "circle",
+        paint: {
+          "fill-color": "#088",
+          "fill-opacity": 0.3,
+        },
+      });
     });
   }, [userLoc, zoom, createLocateControl]);
 
@@ -112,6 +137,28 @@ const Map = forwardRef(function Map({ userLoc, filteredList }, ref) {
     }
   }, [userLoc, isMapLoaded]);
 
+  // userLoc veya mesafe filteresi değiştiğinde circle güncelle
+  useEffect(() => {
+    if (!map.current || !map.current.getSource("circle")) return;
+    const center = [userLoc.longitude, userLoc.latitude];
+    const circle = turf.circle(center, filters.maxDistance, {
+      units: "kilometers",
+    });
+    map.current.getSource("circle").setData(circle);
+  }, [userLoc, filters.maxDistance]);
+
+  useEffect(() => {
+    if (!map.current || !map.current.getSource("circle")) return;
+    const center = [userLoc.longitude, userLoc.latitude];
+    const circle = turf.circle(center, filters.maxDistance, {
+      units: "kilometers",
+    });
+    const bboxCor = turf.bbox(circle);
+    const bbox = [bboxCor.slice(0, 2), bboxCor.slice(2, 4)];
+    map.current.fitBounds(bbox, {
+      padding: {top: 10, bottom:25, left: 15, right: 5}
+  });
+  }, [filters.maxDistance]);
   // Eczane marker'larını güncelle
   const setMarkers = useCallback(() => {
     if (!map.current || !isMapLoaded) return;

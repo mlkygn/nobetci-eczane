@@ -51,7 +51,7 @@ export function usePharmacyFilter(dataPharmacy, filters, userLoc) {
       selectedDistrict: (item, value) =>
         value === "" || item.district === value,
       maxDistance: (item, value) =>
-        !userLoc.latitude || !item.distance || item.distance / 1000 <= value, // metre → km
+        !userLoc.latitude || !item.distance || item.distance <= value, // metre → km
     };
 
     const filtered = applyFilters(dataPharmacy, filters, filterSchema);
