@@ -3,6 +3,7 @@
 import "./sidebar.css";
 import searchIcon from "../../assets/search-icon.svg";
 import notFoundIcon from "../../assets/not-found-icon.png";
+import { FaRoute } from "react-icons/fa";
 
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -50,11 +51,25 @@ export default function Sidebar({
               <div className="d-flex">
                 <div className="name">{item.pharmacyName}</div>
                 {item.distance && (
-                  <div className="distance">mesafe: <strong>{item.distance} km</strong></div>
+                  <div className="distance">
+                    mesafe: <strong>{item.distance} km</strong>
+                  </div>
                 )}
               </div>
               <div className="district">{item.district}</div>
               <div className="address">{item.address}</div>
+              <a
+                className="route-link"
+                onClick={(e) => {
+                  e.stopPropagation;
+                  e.preventDefault;
+                }}
+                href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
+                target="_blank"
+              >
+                <FaRoute className="me-1" />
+                Yol tarifi al
+              </a>
               {/* <div className="time">
                 <FaRegClock className="me-1 icon" />{" "}
                 {item.baslangic.slice(0, 16)} - {item.bitis.slice(0, 16)}

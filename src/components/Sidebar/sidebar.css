@@ -70,6 +70,12 @@
   font-weight: 300;
   color: #a4a4a4;
 }
+.sidebar .list-group-item .route-link {
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1;
+  color: #658bff;
+}
 .skeleton {
   background-color: #e0e0e0;
   border-radius: 4px;
