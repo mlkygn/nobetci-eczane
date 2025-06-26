@@ -32,7 +32,7 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
     if (!map.current) return;
     map.current.flyTo({
       center: [lng, lat],
-      minZoom: zoom,
+      zoom: zoom,
       essential: true,
     });
   }
@@ -87,8 +87,6 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
     });
 
     map.current.on("load", () => {
-      setIsMapLoaded(true);
-
       // Kullanıcı marker'ı oluştur
       const userMarker = new mapboxgl.Marker({ color: "#7893cf" })
         .setLngLat([userLoc.longitude, userLoc.latitude])
@@ -97,9 +95,6 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
 
       // Konumuma Git butonunu ekle
       map.current.addControl(createLocateControl());
-
-      // İlk eczane marker'larını ayarla
-      setMarkers();
 
       // Create a circle polygon using Turf.js
       const circle = turf.circle(
@@ -124,6 +119,10 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
           "fill-opacity": 0.3,
         },
       });
+      // İlk eczane marker'larını ayarla
+      setMarkers();
+      setIsMapLoaded(true);
+      map.current.resize();
     });
   }, [userLoc, zoom, createLocateControl]);
 
@@ -156,9 +155,10 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
     const bboxCor = turf.bbox(circle);
     const bbox = [bboxCor.slice(0, 2), bboxCor.slice(2, 4)];
     map.current.fitBounds(bbox, {
-      padding: {top: 10, bottom:25, left: 15, right: 5}
-  });
+      padding: { top: 10, bottom: 25, left: 15, right: 5 },
+    });
   }, [filters.maxDistance]);
+
   // Eczane marker'larını güncelle
   const setMarkers = useCallback(() => {
     if (!map.current || !isMapLoaded) return;
@@ -191,11 +191,13 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
         map.current.addLayer({
           id: "pharmacy-markers",
           type: "symbol",
+          visibility: "visible",
           source: "pharmacies",
           layout: {
             "icon-image": "custom-marker",
-            "icon-size": 1,
             "icon-allow-overlap": true,
+            "icon-ignore-placement": true,
+            "icon-size": 1,
           },
         });
         map.current.addLayer({
@@ -214,6 +216,62 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
             "text-halo-width": 2,
           },
         });
+        setTimeout(() => {
+          console.log(map.current.hasImage("custom-marker")); // true olmalı
+
+          map.current.on("click", (e) => {
+            console.log("Tıklama Noktası:", e.point);
+
+            filteredList.forEach((p) => {
+              const lngLat = [p.longitude, p.latitude];
+              const screenPoint = map.current.project(lngLat);
+              console.log(
+                `${p.pharmacyName} noktası: x=${screenPoint.x}, y=${screenPoint.y}`
+              );
+            });
+
+            const allFeatures = map.current.queryRenderedFeatures({
+              layers: ["pharmacy-markers"],
+            });
+
+            const clickedFeatures = map.current.queryRenderedFeatures(e.point, {
+              layers: ["pharmacy-markers"],
+            });
+
+            console.log(
+              "Tüm haritada:",
+              allFeatures.length,
+              " / Tıklanan yerde:",
+              clickedFeatures.length
+            );
+
+            if (clickedFeatures.length > 0) {
+              alert("Clicked: " + clickedFeatures[0].properties.title);
+            } else {
+              console.warn("Tıklamada feature bulunamadı.");
+            }
+          });
+          map.current.on("click", (e) => {
+            new mapboxgl.Marker({ color: "red" })
+              .setLngLat(map.current.unproject(e.point))
+              .addTo(map.current);
+          });
+          console.log(
+            map.current.queryRenderedFeatures(undefined, {
+              layers: ["pharmacy-markers"],
+            })
+          );
+          map.current.on("click", "pharmacy-markers", (e) => {
+            // e.features[0] contains the clicked feature
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const properties = e.features[0].properties;
+            // Do something, e.g., open a popup
+            new mapboxgl.Popup()
+              .setLngLat(coordinates)
+              .setHTML(`<strong>${properties.name}</strong>`)
+              .addTo(map.current);
+          });
+        }, 300);
       });
     }
   }, [filteredList, isMapLoaded]);
@@ -222,7 +280,6 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
   useEffect(() => {
     setMarkers();
   }, [filteredList, isMapLoaded, setMarkers]);
-
   return (
     <>
       <div>
