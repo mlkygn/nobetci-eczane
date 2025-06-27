@@ -26,6 +26,7 @@ function Main() {
 
   const [dataDistricts, setDataDistricts] = useState([]);
   const [dataPharmacy, setdataPharmacy] = useState([]);
+  const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [userLoc, setuserLoc] = useState({
     latitude: null,
     longitude: null,
@@ -204,6 +205,7 @@ function Main() {
           </Col>
           <Col xs={{ span: 12 }} md={{ span: 4 }}>
             <Sidebar
+              setSelectedPharmacy={setSelectedPharmacy}
               filters={filters}
               setFilters={setFilters}
               filteredList={filteredList}
@@ -216,6 +218,8 @@ function Main() {
             md={{ span: 8, order: "last" }}
           >
             <Map
+              setSelectedPharmacy={setSelectedPharmacy}
+              selectedPharmacy={selectedPharmacy}
               ref={mapRef}
               userLoc={userLoc}
               filteredList={filteredList}
