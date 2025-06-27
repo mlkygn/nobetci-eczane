@@ -217,50 +217,6 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
           },
         });
         setTimeout(() => {
-          console.log(map.current.hasImage("custom-marker")); // true olmalı
-
-          map.current.on("click", (e) => {
-            console.log("Tıklama Noktası:", e.point);
-
-            filteredList.forEach((p) => {
-              const lngLat = [p.longitude, p.latitude];
-              const screenPoint = map.current.project(lngLat);
-              console.log(
-                `${p.pharmacyName} noktası: x=${screenPoint.x}, y=${screenPoint.y}`
-              );
-            });
-
-            const allFeatures = map.current.queryRenderedFeatures({
-              layers: ["pharmacy-markers"],
-            });
-
-            const clickedFeatures = map.current.queryRenderedFeatures(e.point, {
-              layers: ["pharmacy-markers"],
-            });
-
-            console.log(
-              "Tüm haritada:",
-              allFeatures.length,
-              " / Tıklanan yerde:",
-              clickedFeatures.length
-            );
-
-            if (clickedFeatures.length > 0) {
-              alert("Clicked: " + clickedFeatures[0].properties.title);
-            } else {
-              console.warn("Tıklamada feature bulunamadı.");
-            }
-          });
-          map.current.on("click", (e) => {
-            new mapboxgl.Marker({ color: "red" })
-              .setLngLat(map.current.unproject(e.point))
-              .addTo(map.current);
-          });
-          console.log(
-            map.current.queryRenderedFeatures(undefined, {
-              layers: ["pharmacy-markers"],
-            })
-          );
           map.current.on("click", "pharmacy-markers", (e) => {
             // e.features[0] contains the clicked feature
             const coordinates = e.features[0].geometry.coordinates.slice();
@@ -268,7 +224,7 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
             // Do something, e.g., open a popup
             new mapboxgl.Popup()
               .setLngLat(coordinates)
-              .setHTML(`<strong>${properties.name}</strong>`)
+              .setHTML(`<strong>${properties.title}</strong>`)
               .addTo(map.current);
           });
         }, 300);
@@ -278,14 +234,20 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
 
   // filteredList değiştiğinde marker'ları güncelle
   useEffect(() => {
+    map.current && map.current.resize();
     setMarkers();
   }, [filteredList, isMapLoaded, setMarkers]);
   return (
     <>
-      <div>
-        <div ref={mapContainer} className="map-container">
-          {!isMapLoaded && <Spinner animation="border" variant="secondary" />}
-        </div>
+      <div ref={mapContainer} className="map-container">
+        {!isMapLoaded && (
+          <div className="spinner">
+            <Spinner
+              animation="border"
+              variant="secondary"
+            />
+          </div>
+        )}
       </div>
     </>
   );
