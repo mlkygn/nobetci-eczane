@@ -12,10 +12,11 @@ import Form from "react-bootstrap/Form";
 import Skeleton from "./Skeleton";
 
 export default function Sidebar({
+  selectPharmacy,
+  selectedPharmacy,
   filters,
   setFilters,
   filteredList,
-  flyTo,
   isLoaded,
 }) {
   return (
@@ -46,7 +47,12 @@ export default function Sidebar({
           {filteredList.map((item, index) => (
             <ListGroup.Item
               key={index}
-              onClick={() => flyTo([item.longitude, item.latitude])}
+              onClick={() => selectPharmacy(item.pharmacyID)}
+              className={
+                selectedPharmacy?.pharmacyID === item.pharmacyID
+                  ? "selected"
+                  : ""
+              }
             >
               <div className="d-flex">
                 <div className="name">{item.pharmacyName}</div>
@@ -57,19 +63,23 @@ export default function Sidebar({
                 )}
               </div>
               <div className="district">{item.district}</div>
-              <div className="address">{item.address}</div>
-              <a
-                className="route-link"
-                onClick={(e) => {
-                  e.stopPropagation;
-                  e.preventDefault;
-                }}
-                href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
-                target="_blank"
-              >
-                <FaRoute className="me-1" />
-                Yol tarifi al
-              </a>
+
+              <div className="details">
+                <div className="address">{item.address}</div>
+                <a
+                  className="route-link"
+                  onClick={(e) => {
+                    e.stopPropagation;
+                    e.preventDefault;
+                  }}
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
+                  target="_blank"
+                >
+                  <FaRoute className="me-1" />
+                  Yol tarifi al
+                </a>
+              </div>
+
               {/* <div className="time">
                 <FaRegClock className="me-1 icon" />{" "}
                 {item.baslangic.slice(0, 16)} - {item.bitis.slice(0, 16)}

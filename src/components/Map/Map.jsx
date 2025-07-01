@@ -15,7 +15,10 @@ import * as turf from "@turf/turf";
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
-const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
+const Map = forwardRef(function Map(
+  { selectPharmacy, selectedPharmacy, userLoc, filteredList, filters },
+  ref
+) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const userMarkerRef = useRef(null);
@@ -159,78 +162,110 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
     });
   }, [filters.maxDistance]);
 
-  // Eczane marker'larını güncelle
-  const setMarkers = useCallback(() => {
-    if (!map.current || !isMapLoaded) return;
-
-    const geoJsonData = {
+  const getPharmacyGeoJsonData = useCallback(() => {
+    return {
       type: "FeatureCollection",
       features: filteredList.map((p) => ({
         type: "Feature",
+        id: p.pharmacyID,
         geometry: {
           type: "Point",
           coordinates: [p.longitude, p.latitude],
         },
         properties: {
           title: p.pharmacyName,
+          selected: selectedPharmacy?.pharmacyID === p.pharmacyID || false,
         },
       })),
     };
+  }, [filteredList, selectedPharmacy]);
+
+  // Eczane marker'larını güncelle
+  const setMarkers = useCallback(() => {
+    if (!map.current || !isMapLoaded) return;
+
+    const geoJsonData = getPharmacyGeoJsonData();
 
     const source = map.current.getSource("pharmacies");
     if (source) {
       source.setData(geoJsonData);
     } else {
-      map.current.loadImage("/pharmacy-marker.png", (error, image) => {
-        if (error) throw error;
-        map.current.addImage("custom-marker", image);
-        map.current.addSource("pharmacies", {
-          type: "geojson",
-          data: geoJsonData,
-        });
-        map.current.addLayer({
-          id: "pharmacy-markers",
-          type: "symbol",
-          visibility: "visible",
-          source: "pharmacies",
-          layout: {
-            "icon-image": "custom-marker",
-            "icon-allow-overlap": true,
-            "icon-ignore-placement": true,
-            "icon-size": 1,
-          },
-        });
-        map.current.addLayer({
-          id: "pharmacy-labels",
-          type: "symbol",
-          source: "pharmacies",
-          layout: {
-            "text-field": ["get", "title"],
-            "text-size": 12,
-            "text-offset": [0, 1],
-            "text-anchor": "top",
-          },
-          paint: {
-            "text-color": "#3a7bd5",
-            "text-halo-color": "#ffffff",
-            "text-halo-width": 2,
-          },
-        });
-        setTimeout(() => {
-          map.current.on("click", "pharmacy-markers", (e) => {
-            // e.features[0] contains the clicked feature
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            const properties = e.features[0].properties;
-            // Do something, e.g., open a popup
-            new mapboxgl.Popup()
-              .setLngLat(coordinates)
-              .setHTML(`<strong>${properties.title}</strong>`)
-              .addTo(map.current);
-          });
-        }, 300);
+      map.current.loadImage("/pharmacy-marker.png", (error1, defaultImg) => {
+        if (error1) throw error1;
+
+        map.current.loadImage(
+          "/pharmacy-marker-selected.png",
+          (error2, selectedImg) => {
+            if (error2) throw error2;
+
+            map.current.addImage("marker-default", defaultImg);
+            map.current.addImage("marker-selected", selectedImg);
+
+            map.current.addSource("pharmacies", {
+              type: "geojson",
+              data: geoJsonData,
+            });
+            map.current.addLayer({
+              id: "pharmacy-markers",
+              type: "symbol",
+              visibility: "visible",
+              source: "pharmacies",
+              layout: {
+                "icon-image": [
+                  "case",
+                  ["==", ["get", "selected"], true],
+                  "marker-selected", // Use this icon when selected
+                  "marker-default", // Use this icon otherwise
+                ],
+                "icon-allow-overlap": true,
+                "icon-ignore-placement": true,
+                "icon-size": 1,
+              },
+            });
+            map.current.addLayer({
+              id: "pharmacy-labels",
+              type: "symbol",
+              source: "pharmacies",
+              layout: {
+                "text-field": ["get", "title"],
+                "text-size": 12,
+                "text-offset": [0, 1],
+                "text-anchor": "top",
+              },
+              paint: {
+                "text-color": "#3a7bd5",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 2,
+              },
+            });
+            setTimeout(() => {
+              map.current.on(
+                "click",
+                ["pharmacy-markers", "pharmacy-labels"],
+                (e) => {
+                  if (e.features.length === 0) return;
+                  // Select the clicked feature
+                  const feature = e.features[0];
+                  selectPharmacy(feature.id);
+                }
+              );
+            }, 300);
+          }
+        );
       });
     }
   }, [filteredList, isMapLoaded]);
+
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+    const geoJsonData = getPharmacyGeoJsonData();
+    const source = map.current.getSource("pharmacies");
+    if (source) {
+      source.setData(geoJsonData);
+    }
+    if (!selectedPharmacy) return;
+    flyTo([selectedPharmacy.longitude, selectedPharmacy.latitude]);
+  }, [selectedPharmacy]);
 
   // filteredList değiştiğinde marker'ları güncelle
   useEffect(() => {
@@ -242,10 +277,7 @@ const Map = forwardRef(function Map({ userLoc, filteredList, filters }, ref) {
       <div ref={mapContainer} className="map-container">
         {!isMapLoaded && (
           <div className="spinner">
-            <Spinner
-              animation="border"
-              variant="secondary"
-            />
+            <Spinner animation="border" variant="secondary" />
           </div>
         )}
       </div>

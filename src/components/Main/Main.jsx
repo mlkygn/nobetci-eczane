@@ -26,6 +26,7 @@ function Main() {
 
   const [dataDistricts, setDataDistricts] = useState([]);
   const [dataPharmacy, setdataPharmacy] = useState([]);
+  const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [userLoc, setuserLoc] = useState({
     latitude: null,
     longitude: null,
@@ -138,6 +139,7 @@ function Main() {
       navigator.geolocation.clearWatch(watchId);
     };
   }, []);
+
   useEffect(() => {
     if (!userLoc || dataPharmacy.length === 0) return;
 
@@ -153,6 +155,7 @@ function Main() {
 
     setdataPharmacy(updatedList);
   }, [userLoc]);
+
   const getDistricts = () => {
     fetch(
       "https://www.nosyapi.com/apiv2/service/pharmacies-on-duty/cities?city=erzincan",
@@ -184,6 +187,20 @@ function Main() {
       });
   };
 
+  const selectPharmacy = (pharmacyID) => {
+    if (!pharmacyID) return;
+    setSelectedPharmacy((prevSelectedPharmacy) => {
+      if (
+        prevSelectedPharmacy &&
+        prevSelectedPharmacy.pharmacyID === pharmacyID
+      ) {
+        return null; // Deselect the pharmacy
+      }
+
+      const pharmacy = dataPharmacy?.find((p) => p.pharmacyID === pharmacyID);
+      return pharmacy || null; // Select the new pharmacy or return null if not found
+    });
+  };
   return (
     <main>
       {errors.length > 0 && (
@@ -204,10 +221,11 @@ function Main() {
           </Col>
           <Col xs={{ span: 12 }} md={{ span: 4 }}>
             <Sidebar
+              selectPharmacy={selectPharmacy}
+              selectedPharmacy={selectedPharmacy}
               filters={filters}
               setFilters={setFilters}
               filteredList={filteredList}
-              flyTo={mapRef?.current?.flyTo}
               isLoaded={isLoaded}
             />
           </Col>
@@ -216,6 +234,8 @@ function Main() {
             md={{ span: 8, order: "last" }}
           >
             <Map
+              selectPharmacy={selectPharmacy}
+              selectedPharmacy={selectedPharmacy}
               ref={mapRef}
               userLoc={userLoc}
               filteredList={filteredList}

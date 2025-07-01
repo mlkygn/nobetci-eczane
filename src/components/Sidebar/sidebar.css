@@ -48,9 +48,21 @@
   border-radius: 8px;
   background-color: #f8f8f8;
   margin-bottom: 9px;
+  transition: 0.3s ease-in-out;
 }
 .sidebar .list-group-item:hover {
   background-color: #ececec;
+}
+.sidebar .list-group-item.selected {
+  background-color: #e1e8ff;
+}
+.sidebar .list-group-item .details {
+  max-height: 0;
+  overflow: hidden;
+  transition: 0.3s ease-in-out;
+}
+.sidebar .list-group-item.selected .details {
+  max-height: 300px;
 }
 .sidebar .list-group-item .name {
   font-size: 16px;
