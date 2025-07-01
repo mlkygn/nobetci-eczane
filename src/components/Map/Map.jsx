@@ -16,7 +16,7 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoibWxreWduIiwiYSI6ImNsc3V1eWVzYjEzNGMya211Ynhpam81NHcifQ.WKWqa7kqIdE6g2NQjKQK0g";
 
 const Map = forwardRef(function Map(
-  { setSelectedPharmacy, selectedPharmacy, userLoc, filteredList, filters },
+  { selectPharmacy, selectedPharmacy, userLoc, filteredList, filters },
   ref
 ) {
   const mapContainer = useRef(null);
@@ -174,7 +174,7 @@ const Map = forwardRef(function Map(
         },
         properties: {
           title: p.pharmacyName,
-          selected: selectedPharmacy?.id === p.pharmacyID,
+          selected: selectedPharmacy?.pharmacyID === p.pharmacyID || false,
         },
       })),
     };
@@ -239,18 +239,23 @@ const Map = forwardRef(function Map(
               },
             });
             setTimeout(() => {
-              map.current.on("click", ["pharmacy-markers", "pharmacy-labels"], (e) => {
-                if (e.features.length === 0) return;
-                // Select the clicked feature
-                const feature = e.features[0];
-                setSelectedPharmacy({ id: feature.id });
-              });
+              map.current.on(
+                "click",
+                ["pharmacy-markers", "pharmacy-labels"],
+                (e) => {
+                  if (e.features.length === 0) return;
+                  // Select the clicked feature
+                  const feature = e.features[0];
+                  selectPharmacy(feature.id);
+                }
+              );
             }, 300);
           }
         );
       });
     }
   }, [filteredList, isMapLoaded]);
+
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;
     const geoJsonData = getPharmacyGeoJsonData();
@@ -258,6 +263,8 @@ const Map = forwardRef(function Map(
     if (source) {
       source.setData(geoJsonData);
     }
+    if (!selectedPharmacy) return;
+    flyTo([selectedPharmacy.longitude, selectedPharmacy.latitude]);
   }, [selectedPharmacy]);
 
   // filteredList değiştiğinde marker'ları güncelle
