@@ -239,7 +239,7 @@ const Map = forwardRef(function Map(
               },
             });
             setTimeout(() => {
-              map.current.on("click", "pharmacy-markers", (e) => {
+              map.current.on("click", ["pharmacy-markers", "pharmacy-labels"], (e) => {
                 if (e.features.length === 0) return;
                 // Select the clicked feature
                 const feature = e.features[0];
