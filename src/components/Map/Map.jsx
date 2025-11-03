@@ -150,7 +150,7 @@ const Map = forwardRef(function Map(
   }, [userLoc, filters.maxDistance]);
 
   useEffect(() => {
-    if (!map.current || !map.current.getSource("circle")) return;
+    if (!map.current || !map.current.getSource("circle") || selectedPharmacy) return;
     const center = [userLoc.longitude, userLoc.latitude];
     const circle = turf.circle(center, filters.maxDistance, {
       units: "kilometers",
@@ -160,7 +160,7 @@ const Map = forwardRef(function Map(
     map.current.fitBounds(bbox, {
       padding: { top: 10, bottom: 25, left: 15, right: 5 },
     });
-  }, [filters.maxDistance]);
+  }, [filters.maxDistance, selectedPharmacy]);
 
   const getPharmacyGeoJsonData = useCallback(() => {
     return {

@@ -3,7 +3,7 @@
 import "./sidebar.css";
 import searchIcon from "../../assets/search-icon.svg";
 import notFoundIcon from "../../assets/not-found-icon.png";
-import { FaRoute } from "react-icons/fa";
+import { FaMapMarkedAlt } from "react-icons/fa";
 
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -75,7 +75,7 @@ export default function Sidebar({
                   href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
                   target="_blank"
                 >
-                  <FaRoute className="me-1" />
+                  <FaMapMarkedAlt className="me-1 fs-5" />
                   Yol tarifi al
                 </a>
               </div>
