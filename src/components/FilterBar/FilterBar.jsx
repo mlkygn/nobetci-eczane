@@ -2,8 +2,6 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-import { FaSortAlphaDown } from "react-icons/fa";
-
 function FilterBar({ filters, setFilters, dataDistricts, userLoc }) {
   const handleSortChange = (e) => {
     const field = e.target.value;
@@ -31,12 +29,13 @@ function FilterBar({ filters, setFilters, dataDistricts, userLoc }) {
     }));
   };
   return (
-    <div className="filter-bar ">
+    <div className="filter-bar bg-white p-3 rounded-3 shadow-none">
+      <h3 className="text-center mb-3">Filtreler</h3>
       <Row>
         <Col>
           {/* Sıralama */}
           <div className="filter-box">
-            <FaSortAlphaDown size={"1.5em"} className="me-2" />
+          <span>Sırala: </span>
             <Form.Select onChange={handleSortChange} value={filters.sortField}>
               <option value="pharmacyName" data-order="asc">
                 İsme göre artan
@@ -72,9 +71,9 @@ function FilterBar({ filters, setFilters, dataDistricts, userLoc }) {
         <Col>
           {/* Mesafe filtreleme */}
           <div className="filter-box">
-            <small className="lh-1">
+            <span className="lh-1">
               Maksimum Mesafe: {filters.maxDistance} km
-            </small>
+            </span>
             <Form.Range
               min={10}
               max={200}
