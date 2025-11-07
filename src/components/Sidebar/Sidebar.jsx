@@ -10,6 +10,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Form from "react-bootstrap/Form";
 
 import Skeleton from "./Skeleton";
+import { useEffect, useRef } from "react";
 
 export default function Sidebar({
   selectPharmacy,
@@ -19,8 +20,27 @@ export default function Sidebar({
   filteredList,
   isLoaded,
 }) {
+  const sidebarRef = useRef(null);
+  const itemRefs = useRef({});
+
+  useEffect(() => {
+    if (!selectedPharmacy?.pharmacyID) return;
+
+    const sidebar = sidebarRef.current;
+    const item = itemRefs.current[selectedPharmacy.pharmacyID];
+    if (!sidebar || !item) return;
+
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+    const offset = itemRect.top - sidebarRect.top + sidebar.scrollTop;
+
+    sidebar.scrollTo({
+      top: Math.max(0, offset - 16),
+      behavior: "smooth",
+    });
+  }, [selectedPharmacy]);
   return (
-    <Card className="sidebar">
+    <Card className="sidebar" ref={sidebarRef}>
       <Form.Group className="form-group mb-3">
         <Form.Control
           onChange={(e) =>
@@ -53,6 +73,7 @@ export default function Sidebar({
                   ? "selected"
                   : ""
               }
+              ref={(el) => (itemRefs.current[item.pharmacyID] = el)}
             >
               <div className="d-flex">
                 <div className="name">{item.pharmacyName}</div>
